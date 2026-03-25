@@ -1,0 +1,5 @@
+ldap_domain: uno-soft.ru
+ldap_organization: uno-soft
+ldap_admin_password: uno_dos_tres_cuatro_cinco_@dmin_1_2_3_4_5
+ldap_base_dn: dc=uno-soft,dc=ru
+ldap_admin_dn: cn=admin,dc=uno-soft,dc=ru

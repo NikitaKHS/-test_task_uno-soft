@@ -1,0 +1,78 @@
+---
+- name: Install and configure OpenLDAP server for Uno
+  hosts: ldap
+  become: true
+
+  vars_files:
+    - vars.yml
+
+  tasks:
+    - name: Install debconf-utils
+      apt:
+        name: debconf-utils
+        state: present
+        update_cache: true
+
+    - name: Set slapd install answers
+      debconf:
+        name: slapd
+        question: "{{ item.question }}"
+        value: "{{ item.value }}"
+        vtype: "{{ item.vtype }}"
+      loop:
+        - { question: "slapd/no_configuration", value: "false", vtype: "boolean" }
+        - { question: "slapd/domain", value: "{{ ldap_domain }}", vtype: "string" }
+        - { question: "shared/organization", value: "{{ ldap_organization }}", vtype: "string" }
+        - { question: "slapd/password1", value: "{{ ldap_admin_password }}", vtype: "password" }
+        - { question: "slapd/password2", value: "{{ ldap_admin_password }}", vtype: "password" }
+        - { question: "slapd/backend", value: "MDB", vtype: "select" }
+        - { question: "slapd/purge_database", value: "true", vtype: "boolean" }
+        - { question: "slapd/move_old_database", value: "true", vtype: "boolean" }
+
+    - name: Install OpenLDAP packages
+      apt:
+        name:
+          - slapd
+          - ldap-utils
+        state: present
+        update_cache: true
+
+    - name: Reconfigure slapd
+      command: dpkg-reconfigure -f noninteractive slapd
+      changed_when: true
+
+    - name: Copy base.ldif
+      copy:
+        src: files/base.ldif
+        dest: /tmp/base.ldif
+
+    - name: Add base structure
+      command: >
+        ldapadd -x -D "{{ ldap_admin_dn }}"
+        -w "{{ ldap_admin_password }}"
+        -f /tmp/base.ldif
+      ignore_errors: true
+
+    - name: Copy groups.ldif
+      copy:
+        src: files/groups.ldif
+        dest: /tmp/groups.ldif
+
+    - name: Add groups
+      command: >
+        ldapadd -x -D "{{ ldap_admin_dn }}"
+        -w "{{ ldap_admin_password }}"
+        -f /tmp/groups.ldif
+      ignore_errors: true
+
+    - name: Copy users.ldif
+      copy:
+        src: files/users.ldif
+        dest: /tmp/users.ldif
+
+    - name: Add users
+      command: >
+        ldapadd -x -D "{{ ldap_admin_dn }}"
+        -w "{{ ldap_admin_password }}"
+        -f /tmp/users.ldif
+      ignore_errors: true

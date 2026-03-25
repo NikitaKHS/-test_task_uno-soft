@@ -1,0 +1,7 @@
+dn: ou=people,dc=uno-soft,dc=ru
+objectClass: organizationalUnit
+ou: people
+
+dn: ou=groups,dc=uno-soft,dc=ru
+objectClass: organizationalUnit
+ou: groups

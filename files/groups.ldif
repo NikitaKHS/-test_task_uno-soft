@@ -1,0 +1,9 @@
+dn: cn=developers,ou=groups,dc=uno-soft,dc=ru
+objectClass: groupOfNames
+cn: developers
+member: cn=admin,dc=uno-soft,dc=ru
+
+dn: cn=admins,ou=groups,dc=uno-soft,dc=ru
+objectClass: groupOfNames
+cn: admins
+member: cn=admin,dc=uno-soft,dc=ru
